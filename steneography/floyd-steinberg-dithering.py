@@ -1,9 +1,5 @@
 from PIL import Image
 
-def grey(x, y):
-    sf=int(sum(pixels[x, y])/3)
-    pixels[x, y] = (sf, sf, sf)
-
 img=Image.open('steneography/dolphin.jpg')
 pixels=img.load()
 
