@@ -7,32 +7,23 @@ def grey(x, y):
 img=Image.open('steneography/dolphin.jpg')
 pixels=img.load()
 
-for i in range(img.size[1]-1):
-    for j in range(1, img.size[0]-1):
-        grey(j, i)
-        odlP = list(pixels[j, i])
-        pix = []
-        error = []
-        num_of_colour = 1
-        for f in odlP:
-            pix.append(int(round(num_of_colour * f / 255) * (255/num_of_colour)))
-            error.append(f-pix[-1])
-        pixels[j, i] = tuple(pix)
-        dit_pix_1 = []
-        dit_pix_2 = []
-        dit_pix_3 = []
-        dit_pix_4 = []
-        for a in range(3):
-            dit_pix_1.append(int(list(pixels[j+1, i+1])[a] + error[a] * 7/16))
-        for b in range(3):
-            dit_pix_2.append(int(list(pixels[j-1, i+1])[b] + error[b] * 3/16))
-        for c in range(3):
-            dit_pix_3.append(int(list(pixels[j+1, i+1])[c] + error[c] * 5/16))
-        for d in range(3):
-            dit_pix_4.append(int(list(pixels[j+1, i+1])[d] + error[d] * 1/16))
-        pixels[j+1, i+1] = tuple(dit_pix_1)
-        pixels[j-1, i+1] = tuple(dit_pix_2)
-        pixels[j+1, i+1] = tuple(dit_pix_3)
-        pixels[j+1, i+1] = tuple(dit_pix_4)
+def find_closest_palette_colour(oldP):
+    return (round(oldP[0]/255)*255,round(oldP[1]/255)*255,round(oldP[2]/255)*255)
 
-img.show()
+def twotuplesminus(t1,t2):
+    return (t1[0]-t2[0],t1[1]-t2[1],t1[2]-t2[2])
+
+def twotuplesplus(t1,t2,cons):
+    return (int(t1[0]+t2[0]*cons),int(t1[1]+t2[1]*cons),int(t1[2]+t2[2]*cons))
+
+for y in range(img.size[1]-1):
+    for x in range(1,img.size[0]-1):
+        oldP=pixels[x,y]
+        Npixel=find_closest_palette_colour(oldP)
+        pixels[x,y]=Npixel
+        quant_error=twotuplesminus(oldP,Npixel)
+        pixels[x + 1,y    ] = twotuplesplus(pixels[x + 1,y    ], quant_error , 7 / 16)
+        pixels[x - 1,y + 1] = twotuplesplus(pixels[x - 1,y + 1], quant_error , 3 / 16)
+        pixels[x    ,y + 1] = twotuplesplus(pixels[x    ,y + 1], quant_error , 5 / 16)
+        pixels[x + 1,y + 1] = twotuplesplus(pixels[x + 1,y + 1], quant_error , 1 / 16)
+pixels=img.show()
